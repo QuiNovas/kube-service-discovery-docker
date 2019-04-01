@@ -5,16 +5,19 @@ kc.loadFromDefault();
 const k8sApi = kc.makeApiClient(k8s.Core_v1Api);
 const scanPort = process.env.SCAN_PORT || 8080
 const pollInt = process.env.POLL_INTERVAL || 500
+const namespace = process.env.NAMESPACE || 'default'
+const app = process.env.APP || 'default'
+
 var hosts = [];
 var oldHosts = [];
 const getHosts = function(){
   hosts = [];
-  k8sApi.listNamespacedPod('default').then( (res) => {
+  k8sApi.listNamespacedPod(namespace).then( (res) => {
     var items = res.body.items;
     var pods = []
     var n=0
     for(let i=0; i < items.length; i++){
-      if(items[i].metadata.labels.app === 'pulsar'){
+      if(items[i].metadata.labels.app === app){
         pods.push(items[i].status.podIP);
       }
     }
