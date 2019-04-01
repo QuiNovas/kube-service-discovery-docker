@@ -6,10 +6,10 @@ var sub = require('child_process');
 var poll = sub.fork('./kubepoll.js');
 var hostList = [];
 
-var httpPort = process.env.HTTP_PORT
-var httpsPort = process.env.HTTPS_PORT
+var httpPort = process.env.HTTP_PORT || 80
+var httpsPort = process.env.HTTPS_PORT || 443
 
-var servicePort = process.env.SERVICE_PORT
+var servicePort = process.env.SERVICE_PORT || 443
 
 poll.on('message', function(m) {
   console.log("New hostlist received: " + m);
@@ -19,7 +19,11 @@ poll.on('message', function(m) {
 http.createServer(function(req, res){
   var host = hostList[Math.floor(Math.random()*hostList.length)];
   res.writeHead(200, {"Content-Type": "text/plain"});
-  res.writeHead(302, 'https://' + host + ':' + servicePort + req.url);
+  if(servicePort != 443){
+    res.writeHead(302, 'https://' + host + ':' + servicePort + req.url);
+  }else{
+    res.writeHead(302, 'https://' + host + req.url);
+  }
   res.end();
 }).listen(httpPort);
 
@@ -31,6 +35,10 @@ var ssl = {
 var httpsServer = https.createServer(ssl, function (req, res) {
   var host = hostList[Math.floor(Math.random()*hostList.length)];
   res.writeHead(200, {"Content-Type": "text/plain"});
-  res.writeHead(302, 'https://' + host + ':' + servicePort + req.url);
+  if(servicePort != 443){
+    res.writeHead(302, 'https://' + host + ':' + servicePort + req.url);
+  }else{
+    res.writeHead(302, 'https://' + host + req.url);
+  }
   res.end();
 }).listen(httpsPort)
