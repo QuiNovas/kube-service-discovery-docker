@@ -6,6 +6,11 @@ var sub = require('child_process');
 var poll = sub.fork('./kubepoll.js');
 var hostList = [];
 
+var httpPort = process.env.HTTP_PORT
+var httpsPort = process.env.HTTPS_PORT
+
+var servicePort = process.env.SERVICE_PORT
+
 poll.on('message', function(m) {
   console.log("New hostlist received: " + m);
   hostList = m
@@ -14,9 +19,9 @@ poll.on('message', function(m) {
 http.createServer(function(req, res){
   var host = hostList[Math.floor(Math.random()*hostList.length)];
   res.writeHead(200, {"Content-Type": "text/plain"});
-  res.writeHead(302, 'https://' + host + req.url);
+  res.writeHead(302, 'https://' + host + ':' + servicePort + req.url);
   res.end();
-}).listen(80);
+}).listen(httpPort);
 
 var ssl = {
     key: fs.readFileSync('/ssl/key.key'),
@@ -26,6 +31,6 @@ var ssl = {
 var httpsServer = https.createServer(ssl, function (req, res) {
   var host = hostList[Math.floor(Math.random()*hostList.length)];
   res.writeHead(200, {"Content-Type": "text/plain"});
-  res.writeHead(302, 'https://' + host + req.url);
+  res.writeHead(302, 'https://' + host + ':' + servicePort + req.url);
   res.end();
-}).listen(443)
+}).listen(httpsPort)
