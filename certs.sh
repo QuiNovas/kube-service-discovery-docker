@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -z "${GENERATE_CERT}"]; then
+if [ ! -z "${GENERATE_CERT}" ]; then
   apk add --no-cache openssl
   mkdir /ssl
   cd /ssl
