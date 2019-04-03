@@ -1,8 +1,7 @@
 #!/bin/sh
 
 if [ ! -z "${GENERATE_CERT}" ]; then
-  apk add --no-cache openssl
-  mkdir /ssl
+  mkdir /ssl 2>/dev/null
   cd /ssl
 
   CSR_CONFIG=$(cat<<EOF

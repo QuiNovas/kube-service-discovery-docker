@@ -15,8 +15,12 @@ poll.on('message', function(m) {
 });
 
 http.createServer(function(req, res){
+  if(hostList.length == 0){
+    res.writeHead(404, {"Content-Type": "text/plain"});
+    res.end()
+    return;
+  }
   var host = hostList[Math.floor(Math.random()*hostList.length)];
-  res.writeHead(200, {"Content-Type": "text/plain"});
   if(httpServicePort != 80){
     res.writeHead(302, 'https://' + host + ':' + httpServicePort + req.url);
   }else{
@@ -31,8 +35,12 @@ var ssl = {
 }
 
 var httpsServer = https.createServer(ssl, function (req, res) {
+  if(hostList.length == 0){
+    res.writeHead(404, {"Content-Type": "text/plain"});
+    res.end()
+    return;
+  }
   var host = hostList[Math.floor(Math.random()*hostList.length)];
-  res.writeHead(200, {"Content-Type": "text/plain"});
   if(httpsServicePort != 443){
     res.writeHead(302, 'https://' + host + ':' + httpsServicePort + req.url);
   }else{
